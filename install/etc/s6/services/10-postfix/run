@@ -10,5 +10,16 @@ if [ ! -f /tmp/state/09-rsyslog ]; then
   echo 'Initialization Complete' >/tmp/state/10-postfix
 fi
 
-echo '** [postfix-relay] Starting postfix'
-exec /usr/sbin/postfix -c /etc/postfix start-fg
+# Check Postfix configuration
+
+postconf -c /opt/postfix/conf
+
+if [[ $? != 0 ]]; then
+  echo "Postfix configuration error, refusing to start."
+  exit 1
+else
+  echo '** [postfix] Starting postfix'
+  exec /usr/sbin/postfix -c /opt/etc/postfix/conf start-fg
+fi
+
+
